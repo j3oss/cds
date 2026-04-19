@@ -1,0 +1,53 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "test_darray (Debug)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/Debug/test_darray",
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "build-debug"
+    },
+    {
+      "name": "test_darray (Release)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/Release/test_darray",
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "build-release"
+    },
+    {
+      "name": "test_hashmap (Debug)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/Debug/test_hashmap",
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "build-debug"
+    },
+    {
+      "name": "test_hashmap (Release)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/Release/test_hashmap",
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "build-release"
+    },
+    {
+      "name": "test_hashset (Debug)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/Debug/test_hashset",
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "build-debug"
+    },
+    {
+      "name": "test_hashset (Release)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/Release/test_hashset",
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "build-release"
+    }
+  ]
+}
