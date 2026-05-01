@@ -8,7 +8,7 @@
 #define DARRAY_INIT_CAPACITY 10
 #define DARRAY_DEFAULT_GROWTH 1.5f
 
-#define DARRAY_TYPE(X, Y)																						\
+#define DARRAY_DECLARE(X, Y)																					\
 struct X																										\
 {																												\
 	size_t size;																								\
@@ -16,7 +16,23 @@ struct X																										\
 	float growth_factor;																						\
 	Y* data;																									\
 };																												\
-typedef struct X* X;
+typedef struct X* X;																							\
+X X##_new(size_t capacity, float growth_factor);																\
+void X##_free(X da);																							\
+bool X##_shrink_fit(X da);																						\
+bool X##_reserve(X da, size_t new_capacity);																	\
+bool X##_reserve_n(X da, size_t additional);																	\
+bool X##_resize(X da, size_t size);																				\
+size_t X##_push(X da, Y* data);																					\
+bool X##_pop(X da);																								\
+size_t X##_remove(X da, size_t index);																			\
+size_t X##_remove_ordered(X da, size_t index);																	\
+size_t X##_push_indexed(X da, size_t index, Y* data);															\
+bool X##_is_empty(X da);																						\
+Y* X##_get_data(X da);																							\
+size_t X##_get_size(X da);																						\
+size_t X##_get_capacity(X da);																					\
+Y* X##_get_at(X da, size_t index);
 
 #define DARRAY_DEFINE(X, Y)																						\
 static inline bool X##_internal_realloc(X da, size_t new_capacity)												\
@@ -48,7 +64,7 @@ static inline bool X##_internal_grow(X da, size_t n)															\
 	return X##_internal_realloc(da, new_cap);																	\
 }																												\
 																												\
-static X X##_new(size_t capacity, float growth_factor)															\
+X X##_new(size_t capacity, float growth_factor)																	\
 {																												\
 	size_t init_cap = capacity ? capacity : DARRAY_INIT_CAPACITY;												\
 																												\
@@ -69,7 +85,7 @@ static X X##_new(size_t capacity, float growth_factor)															\
 	return da;																									\
 }																												\
 																												\
-static void X##_free(X da)																						\
+void X##_free(X da)																								\
 {																												\
 	if (!da)																									\
 		return;																									\
@@ -77,13 +93,13 @@ static void X##_free(X da)																						\
 	free(da);																									\
 }																												\
 																												\
-static bool X##_shrink_fit(X da)																				\
+bool X##_shrink_fit(X da)																						\
 {																												\
 	assert(da);																									\
 	return X##_internal_realloc(da, da->size);																	\
 }																												\
 																												\
-static bool X##_reserve(X da, size_t new_capacity)																\
+bool X##_reserve(X da, size_t new_capacity)																		\
 {																												\
 	assert(da);																									\
 	if (da->capacity >= new_capacity)																			\
@@ -91,13 +107,13 @@ static bool X##_reserve(X da, size_t new_capacity)																\
 	return X##_internal_realloc(da, new_capacity);																\
 }																												\
 																												\
-static bool X##_reserve_n(X da, size_t additional)																\
+bool X##_reserve_n(X da, size_t additional)																		\
 {																												\
 	assert(da);																									\
 	return X##_reserve(da, da->size + additional);																\
 }																												\
 																												\
-static bool X##_resize(X da, size_t size)																		\
+bool X##_resize(X da, size_t size)																				\
 {																												\
 	assert(da);																									\
 	bool result = true;																							\
@@ -111,7 +127,7 @@ static bool X##_resize(X da, size_t size)																		\
 	return result;																								\
 }																												\
 																												\
-static size_t X##_push(X da, Y* data)																			\
+size_t X##_push(X da, Y* data)																					\
 {																												\
 	assert(da);																									\
 	if (!X##_internal_grow(da, 1))																				\
@@ -120,7 +136,7 @@ static size_t X##_push(X da, Y* data)																			\
 	return da->size++;																							\
 }																												\
 																												\
-static bool X##_pop(X da)																						\
+bool X##_pop(X da)																								\
 {																												\
 	assert(da);																									\
 	if (da->size == 0)																							\
@@ -129,7 +145,7 @@ static bool X##_pop(X da)																						\
 	return true;																								\
 }																												\
 																												\
-static size_t X##_remove(X da, size_t index)																	\
+size_t X##_remove(X da, size_t index)																			\
 {																												\
 	assert(da);																									\
 	assert(index < da->size);																					\
@@ -139,7 +155,7 @@ static size_t X##_remove(X da, size_t index)																	\
 	return da->size;																							\
 }																												\
 																												\
-static size_t X##_remove_ordered(X da, size_t index)															\
+size_t X##_remove_ordered(X da, size_t index)																	\
 {																												\
 	assert(da);																									\
 	assert(index < da->size);																					\
@@ -149,7 +165,7 @@ static size_t X##_remove_ordered(X da, size_t index)															\
 	return da->size;																							\
 }																												\
 																												\
-static size_t X##_push_indexed(X da, size_t index, Y* data)														\
+size_t X##_push_indexed(X da, size_t index, Y* data)															\
 {																												\
 	assert(da);																									\
 	if (index > da->size)																						\
@@ -163,31 +179,31 @@ static size_t X##_push_indexed(X da, size_t index, Y* data)														\
 	return index;																								\
 }																												\
 																												\
-static bool X##_is_empty(X da)																					\
+bool X##_is_empty(X da)																							\
 {																												\
 	assert(da);																									\
 	return da->size == 0;																						\
 }																												\
 																												\
-static Y* X##_get_data(X da)																					\
+Y* X##_get_data(X da)																							\
 {																												\
 	assert(da);																									\
 	return da->data;																							\
 }																												\
 																												\
-static size_t X##_get_size(X da)																				\
+size_t X##_get_size(X da)																						\
 {																												\
 	assert(da);																									\
 	return da->size;																							\
 }																												\
 																												\
-static size_t X##_get_capacity(X da)																			\
+size_t X##_get_capacity(X da)																					\
 {																												\
 	assert(da);																									\
 	return da->capacity;																						\
 }																												\
 																												\
-static Y* X##_get_at(X da, size_t index)																		\
+Y* X##_get_at(X da, size_t index)																				\
 {																												\
 	assert(da && da->data);																						\
 	assert(index < da->size);																					\

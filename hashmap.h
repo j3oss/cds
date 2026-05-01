@@ -52,8 +52,8 @@
     _h;																										\
 })
 
-#define HASHMAP_TYPE(X, Y, Z) HASHMAP_TYPE_CUSTOM(X, Y, Z, HASHMAP_DEFAULT_CMP, HASHMAP_DEFAULT_HASH)
-#define HASHMAP_TYPE_CUSTOM(X, Y, Z, CMP, HASH)																\
+#define HASHMAP_DECLARE(X, Y, Z) HASHMAP_DECLARE_CUSTOM(X, Y, Z, HASHMAP_DEFAULT_CMP, HASHMAP_DEFAULT_HASH)
+#define HASHMAP_DECLARE_CUSTOM(X, Y, Z, CMP, HASH)															\
 typedef struct X* X;																						\
 struct X																									\
 { 																											\
@@ -65,18 +65,17 @@ struct X																									\
     int8_t *ctrl;																							\
     Y* keys;																								\
     Z* values;																								\
-};
+};																											\
+X X##_new(size_t capacity);																					\
+void X##_free(X hm);																						\
+bool X##_contains(const X hm, const Y* key);																\
+Z* X##_get(const X hm, const Y* key);																		\
+bool X##_add(X hm, const Y* key, const Z* value);															\
+bool X##_remove(X hm, const Y* key);
 
 #define HASHMAP_DEFINE(X, Y, Z) HASHMAP_DEFINE_CUSTOM(X, Y, Z, HASHMAP_DEFAULT_CMP, HASHMAP_DEFAULT_HASH)
 #define HASHMAP_DEFINE_CUSTOM(X, Y, Z, CMP, HASH)															\
-static X X##_new(size_t capacity);	 																		\
-static void X##_free(X hm);																					\
-static bool X##_contains(const X hm, const Y* key);												    		\
-static Z* X##_get(const X hm, const Y* key);																\
-static bool X##_add(X hm, const Y* key, const Z* value);													\
-static bool X##_remove(X hm, const Y* key);																	\
-																											\
-static X X##_new(size_t capacity)	 																		\
+X X##_new(size_t capacity)	 																				\
 {																											\
 	X hm = malloc(sizeof(struct X));																		\
 	if (!hm)																								\
@@ -105,7 +104,7 @@ static X X##_new(size_t capacity)	 																		\
 	return hm;																								\
 }																											\
 																											\
-static void X##_free(X hm)																					\
+void X##_free(X hm)																							\
 {																											\
 	free(hm->ctrl);																							\
 	free(hm->keys);																							\
@@ -152,7 +151,7 @@ static inline size_t X##_probe(const X hm, const Y* key, const uint64_t h)    		
 	}																				       					\
 }																											\
 																											\
-static size_t X##_probe_insert(const X hm, const Y* key, const uint64_t h)		    						\
+static inline size_t X##_probe_insert(const X hm, const Y* key, const uint64_t h)		    				\
 {																											\
 	size_t pos = h >> 7 & (hm->capacity - 1);											    				\
 	int8_t h2 = h & 0x7f;																					\
@@ -215,13 +214,13 @@ static inline bool X##_rehash_grow(X hm, size_t new_capacity)												\
 	return true;																							\
 }																											\
 																											\
-static bool X##_contains(const X hm, const Y* key)												    		\
+bool X##_contains(const X hm, const Y* key)												    				\
 {																											\
 	uint64_t h = X##_hash(key, sizeof(Y), hm->seed);														\
 	return HASHMAP_PROBE_RESULT_GET_FOUND(X##_probe(hm, key, h));											\
 }																											\
 																											\
-static Z* X##_get(const X hm, const Y* key)																	\
+Z* X##_get(const X hm, const Y* key)																		\
 {																											\
 	uint64_t h = X##_hash(key, sizeof(Y), hm->seed);														\
 																											\
@@ -232,7 +231,7 @@ static Z* X##_get(const X hm, const Y* key)																	\
 	return NULL;																							\
 }																											\
 																											\
-static bool X##_add(X hm, const Y* key, const Z* value)														\
+bool X##_add(X hm, const Y* key, const Z* value)															\
 {																											\
 	if (HASHMAP_UNLIKELY((hm->size + hm->deleted_size) >= hm->capacity * HASHMAP_MAX_LOAD_FACTOR))			\
 	{																										\
@@ -265,7 +264,7 @@ static bool X##_add(X hm, const Y* key, const Z* value)														\
 	return true;																							\
 }																											\
 																											\
-static bool X##_remove(X hm, const Y* key)																	\
+bool X##_remove(X hm, const Y* key)																			\
 {																											\
 	uint64_t h = X##_hash(key, sizeof(Y), hm->seed);														\
 																											\

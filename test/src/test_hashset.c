@@ -1,7 +1,5 @@
 #include "common.h"
 
-U64_SET(HASHSET_DEFINE)
-
 #define N 10000000ULL
 
 static double now_sec(void)

@@ -3,11 +3,6 @@
 
 #include "common.h"
 
-INT_DA(DARRAY_DEFINE)
-TEST_STRUCT_DA(DARRAY_DEFINE)
-STR32_DA(DARRAY_DEFINE)
-CHARPTR_DA(DARRAY_DEFINE)
-
 #define TEST_COUNT 10000000
 
 /* ------------------------------------------------------------ */

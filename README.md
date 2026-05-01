@@ -6,14 +6,17 @@ A collection of generic, header-only C data structures.
 - **[hashset.h](hashset.h)** Swiss Table inspired hash set
 - **[darray.h](darray.h)** Dynamic array
 
-All three follow the same pattern: `TYPE` emits only the struct/typedef. `DEFINE` emits the function implementations as `static` and must appear in each translation unit that uses the API.
+All three follow the same two-macro pattern:
+
+- `DECLARE` — emits the struct/typedef **and** forward declarations for all public functions.
+- `DEFINE` — emits the function implementations. Call this exactly once per type, in one `.c` file.
 
 ## hashmap
 
 ```c
 #include "hashmap.h"
 
-HASHMAP_TYPE(u64_map, uint64_t, uint64_t)
+HASHMAP_DECLARE(u64_map, uint64_t, uint64_t)
 HASHMAP_DEFINE(u64_map, uint64_t, uint64_t)
 
 u64_map m = u64_map_new(0);
@@ -31,7 +34,7 @@ u64_map_free(m);
 ```c
 #include "hashset.h"
 
-HASHSET_TYPE(u64_set, uint64_t)
+HASHSET_DECLARE(u64_set, uint64_t)
 HASHSET_DEFINE(u64_set, uint64_t)
 
 u64_set s = u64_set_new(0);
@@ -48,7 +51,7 @@ u64_set_free(s);
 ```c
 #include "darray.h"
 
-DARRAY_TYPE(int_da, int)
+DARRAY_DECLARE(int_da, int)
 DARRAY_DEFINE(int_da, int)
 
 int_da da = int_da_new(0, 1.5f);
@@ -61,24 +64,15 @@ int_da_pop(da);
 int_da_free(da);
 ```
 
-## Sharing types across translation units
+## Alias macros
 
-To avoid repeating template arguments in every `.c` file, define a macro alongside the type:
+To avoid repeating type arguments across `DECLARE` and `DEFINE` calls, define an alias macro:
 
 ```c
-// common.h
-#define U64_MAP(f) f(u64_map, uint64_t, uint64_t)
-U64_MAP(HASHMAP_TYPE)
-
 #define INT_DA(f) f(int_da, int)
-INT_DA(DARRAY_TYPE)
-```
 
-```c
-// foo.c, bar.c, ...
-#include "common.h"
-U64_MAP(HASHMAP_DEFINE)
+INT_DA(DARRAY_DECLARE)
 INT_DA(DARRAY_DEFINE)
 ```
 
-`HASHMAP_TYPE_CUSTOM` / `HASHMAP_DEFINE_CUSTOM` and `HASHSET_TYPE_CUSTOM` / `HASHSET_DEFINE_CUSTOM` accept additional comparator and hash macro arguments.
+`HASHMAP_DECLARE_CUSTOM` / `HASHMAP_DEFINE_CUSTOM` and `HASHSET_DECLARE_CUSTOM` / `HASHSET_DEFINE_CUSTOM` accept additional comparator and hash macro arguments.
